@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 import config
 
+
 def create_app():
     app = Flask(__name__)
 
@@ -17,6 +18,26 @@ def create_app():
     # ENABLE CORS
     # =========================
     CORS(app)
+
+    # =========================
+    # INITIALIZE DATABASE (FAIL FAST)
+    # =========================
+    from database.mongo import get_database
+    get_database()
+
+    # =========================
+    # LOAD ML MODELS INTO MEMORY (FAIL FAST)
+    # =========================
+    import services.model_loader
+
+    # =========================
+    # REGISTER API ROUTES
+    # =========================
+    from routes.pre_lime_routes import pre_lime_bp
+    from routes.post_lime_routes import post_lime_bp
+
+    app.register_blueprint(pre_lime_bp, url_prefix="/api/v1/pre-lime")
+    app.register_blueprint(post_lime_bp, url_prefix="/api/v1/post-lime")
 
     # =========================
     # HEALTH CHECK
@@ -35,11 +56,17 @@ def create_app():
     # =========================
     @app.errorhandler(404)
     def not_found(error):
-        return jsonify({"error": "Resource not found"}), 404
+        return jsonify({
+            "status": "error",
+            "message": "Resource not found"
+        }), 404
 
     @app.errorhandler(500)
     def internal_error(error):
-        return jsonify({"error": "Internal server error"}), 500
+        return jsonify({
+            "status": "error",
+            "message": "Internal server error"
+        }), 500
 
     return app
 
