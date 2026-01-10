@@ -35,9 +35,11 @@ def create_app():
     # =========================
     from routes.pre_lime_routes import pre_lime_bp
     from routes.post_lime_routes import post_lime_bp
+    from routes.history_routes import history_bp
 
     app.register_blueprint(pre_lime_bp, url_prefix="/api/v1/pre-lime")
     app.register_blueprint(post_lime_bp, url_prefix="/api/v1/post-lime")
+    app.register_blueprint(history_bp, url_prefix="/api/v1/history")
 
     # =========================
     # HEALTH CHECK
