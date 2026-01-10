@@ -1,0 +1,27 @@
+/* Component-scoped styles for Navbar.jsx */
+
+/* Desktop dropdown: hidden -> visible with slight pop animation */
+.dropdown {
+  opacity: 0;
+  transform: translateY(-6px);
+  transform-origin: top;
+  transition: opacity 150ms ease, transform 150ms ease;
+  pointer-events: none;
+}
+
+.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Mobile menu open/close transition using max-height */
+.mobileMenu {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 180ms ease;
+}
+
+.mobileOpen {
+  max-height: 720px; /* adjust if you have taller menu content */
+}
