@@ -7,24 +7,18 @@ classification_bp = Blueprint("classification", __name__)
 
 
 @classification_bp.route("/predict", methods=["POST"])
-def classify():
+def predict():
     try:
         data = request.get_json(force=True)
 
-        validate_required_fields(
-            data, ["ph", "turbidity", "conductivity"]
+        result = run_classification(
+            ph=data["ph"],
+            turbidity=data["turbidity"],
+            conductivity=data["conductivity"]
         )
 
-        ph = validate_numeric(data["ph"], "ph")
-        turbidity = validate_numeric(data["turbidity"], "turbidity")
-        conductivity = validate_numeric(data["conductivity"], "conductivity")
-
-        result = run_classification(ph, turbidity, conductivity)
-
-        return success_response(
-            data=result,
-            message="Classification completed"
-        )
+        return success_response(data=result, message="Classification successful")
 
     except Exception as e:
         return error_response(str(e), 400)
+

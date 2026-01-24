@@ -1,29 +1,31 @@
 import numpy as np
-from typing import Dict
 from services.model_loader import classification_assets
 
 
-def classify_water_safety(
-    ph: float,
-    turbidity: float,
-    conductivity: float
-) -> Dict:
+def classify_water_safety(ph, turbidity, conductivity):
+
+    # ---- Validate inputs ----
+    ph = float(ph)
+    turbidity = float(turbidity)
+    conductivity = float(conductivity)
 
     model = classification_assets["model"]
-    threshold = classification_assets["threshold"]
+    threshold = float(classification_assets["threshold"])
     feature_order = classification_assets["feature_order"]
 
-    input_map = {
-        "ph": ph,
-        "turbidity": turbidity,
-        "conductivity": conductivity
+    FEATURE_MAP = {
+        "Raw_Water_PH": ph,
+        "Raw_Water_Turbidity": turbidity,
+        "Raw_Water_Conductivity": conductivity
     }
 
-    ordered_features = np.array(
-        [input_map[f] for f in feature_order]
+    # ---- Use feature order from pickle ----
+    X = np.array(
+        [FEATURE_MAP[f] for f in feature_order],
+        dtype=float
     ).reshape(1, -1)
 
-    probability = float(model.predict_proba(ordered_features)[0][1])
+    probability = float(model.predict_proba(X)[0][1])
 
     status = "ABNORMAL" if probability >= threshold else "NORMAL"
 

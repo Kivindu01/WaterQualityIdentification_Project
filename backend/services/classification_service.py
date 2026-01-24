@@ -9,8 +9,10 @@ def run_classification(
     conductivity: float
 ) -> Dict:
 
-    result = classify_water_safety(ph, turbidity, conductivity)
+    print("RUN_CLASSIFICATION INPUTS:", ph, turbidity, conductivity)
 
+    result = classify_water_safety(ph, turbidity, conductivity)
+    print(" Classifications model results: ", result)
     record_id = save_classification_prediction({
         "inputs": {
             "ph": ph,
