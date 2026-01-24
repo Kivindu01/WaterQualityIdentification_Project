@@ -5,6 +5,7 @@ from database.repositories import (
     fetch_post_lime_history
 )
 from utils.response_builder import success_response, error_response
+from flask_jwt_extended import jwt_required
 
 history_bp = Blueprint("history", __name__)
 
@@ -28,6 +29,7 @@ def parse_date(date_str: str) -> datetime:
 # =========================
 
 @history_bp.route("/pre-lime", methods=["GET"])
+@jwt_required()
 def get_pre_lime_history():
     try:
         start_date = request.args.get("start_date")

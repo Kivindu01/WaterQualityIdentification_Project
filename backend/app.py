@@ -1,5 +1,6 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 import config
 
 
@@ -14,10 +15,19 @@ def create_app():
     app.config["APP_NAME"] = config.APP_NAME
     app.config["API_VERSION"] = config.API_VERSION
 
+    #  JWT CONFIG
+    app.config["JWT_SECRET_KEY"] = config.JWT_SECRET_KEY
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = config.JWT_ACCESS_TOKEN_EXPIRES
+
     # =========================
     # ENABLE CORS
     # =========================
     CORS(app)
+
+    # =========================
+    # INIT JWT
+    # =========================
+    jwt = JWTManager(app)
 
     # =========================
     # INITIALIZE DATABASE (FAIL FAST)
@@ -49,6 +59,9 @@ def create_app():
     app.register_blueprint(advance_regression_bp, url_prefix="/api/v1/advance-regression")
     app.register_blueprint(normal_regression_bp, url_prefix="/api/v1/normal-regression")
 
+    #  AUTH ROUTES
+    from routes.auth_routes import auth_bp
+    app.register_blueprint(auth_bp, url_prefix="/api/v1/auth")
 
     # =========================
     # HEALTH CHECK

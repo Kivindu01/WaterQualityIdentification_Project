@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from flask_jwt_extended import jwt_required
 
 from services.post_lime_service import run_post_lime_prediction
 from utils.validators import (
@@ -12,6 +13,7 @@ post_lime_bp = Blueprint("post_lime", __name__)
 
 
 @post_lime_bp.route("/predict", methods=["POST"])
+@jwt_required()
 def predict_post_lime():
     try:
         data = request.get_json(force=True)

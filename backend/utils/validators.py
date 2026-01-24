@@ -30,3 +30,8 @@ def validate_ranges(raw_ph: float, turbidity: float, conductivity: float):
 
     if conductivity < 0:
         raise ValueError("raw_conductivity must be >= 0")
+
+
+def validate_password(password: str):
+    if len(password) < 6:
+        raise ValueError("Password must be at least 6 characters long")
