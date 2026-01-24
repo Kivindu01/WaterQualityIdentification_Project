@@ -6,259 +6,169 @@ import styles from "./Navbar.module.css";
 
 /**
  * components/Navbar.jsx
- * Client component for Next.js app router. Uses Tailwind for layout and a CSS module for small transitions.
+ * Modern navbar matching Water Quality Dashboard design system.
+ * Features: Blue/cyan gradient, dark mode support, smooth animations, responsive.
  */
 
 export default function Navbar() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [docsOpen, setDocsOpen] = useState(false);
-  const docsRef = useRef(null);
+	const [mobileOpen, setMobileOpen] = useState(false);
+	const docsRef = useRef(null);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(e) {
-      if (docsRef.current && !docsRef.current.contains(e.target)) {
-        setDocsOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+	// Close dropdown when clicking outside
+	useEffect(() => {
+		function handleClickOutside(e) {
+			if (docsRef.current && !docsRef.current.contains(e.target)) {
+				setMobileOpen(false);
+			}
+		}
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => document.removeEventListener("mousedown", handleClickOutside);
+	}, []);
 
-  // Close menus on Escape
-  useEffect(() => {
-    function onKey(e) {
-      if (e.key === "Escape") {
-        setMobileOpen(false);
-        setDocsOpen(false);
-      }
-    }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, []);
+	// Close menus on Escape
+	useEffect(() => {
+		function onKey(e) {
+			if (e.key === "Escape") {
+				setMobileOpen(false);
+			}
+		}
+		document.addEventListener("keydown", onKey);
+		return () => document.removeEventListener("keydown", onKey);
+	}, []);
 
-  return (
-    <header className="bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <nav
-          className="flex h-16 items-center justify-between"
-          aria-label="Top navigation"
-        >
-          {/* Left: brand */}
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              <img
-                className="h-8 w-8 rounded-md"
-                src="https://via.placeholder.com/40"
-                alt="Logo"
-              />
-              <span className="font-semibold text-lg">YourBrand</span>
-            </Link>
-          </div>
+	return (
+		<header className="border-b border-zinc-200 bg-white/80 backdrop-blur-sm dark:border-zinc-700 dark:bg-black/50">
+			<div className="mx-auto max-w-6xl px-6">
+				<nav
+					className="flex h-16 items-center justify-between"
+					aria-label="Top navigation"
+				>
+					{/* Left: brand */}
+					<div className="flex items-center">
+						<Link href="/" className="flex items-center space-x-3 group">
+							<div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600">
+								<span className="text-sm font-bold text-white">WQ</span>
+							</div>
+							<span className="font-bold text-lg text-black dark:text-white">
+								Water Quality
+							</span>
+						</Link>
+					</div>
 
-          {/* Center: nav links (hidden on mobile) */}
-          <div className="hidden md:flex md:items-center md:space-x-6">
-            <Link href="/" className="text-gray-600 hover:text-gray-900">
-              Home
-            </Link>
-            <Link
-              href="/features"
-              className="text-gray-600 hover:text-gray-900"
-            >
-              Features
-            </Link>
-            <Link href="/pricing" className="text-gray-600 hover:text-gray-900">
-              Pricing
-            </Link>
+					{/* Center: nav links (hidden on mobile) */}
+					<div className="hidden md:flex md:items-center md:space-x-1">
+						<Link
+							href="/"
+							className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-700 transition-all hover:bg-zinc-100 hover:text-black dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+						>
+							Home
+						</Link>
+						<Link
+							href="/water-footprint"
+							className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-700 transition-all hover:bg-zinc-100 hover:text-black dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+						>
+							Water Footprint
+						</Link>
+						<Link
+							href="/about"
+							className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-700 transition-all hover:bg-zinc-100 hover:text-black dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+						>
+							About Us
+						</Link>
+						<Link
+							href="/contact"
+							className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-700 transition-all hover:bg-zinc-100 hover:text-black dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+						>
+							Contact Us
+						</Link>
+					</div>
 
-            {/* Docs dropdown */}
-            <div className="relative" ref={docsRef}>
-              <button
-                type="button"
-                aria-haspopup="true"
-                aria-expanded={docsOpen}
-                onClick={() => setDocsOpen((s) => !s)}
-                className="text-gray-600 hover:text-gray-900 inline-flex items-center gap-1"
-              >
-                Docs
-                <svg
-                  className="w-4 h-4 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
+					{/* Right: actions + mobile menu button */}
+					<div className="flex items-center space-x-3">
+						<Link
+							href="/signin"
+							className="hidden md:inline text-sm text-gray-600 hover:text-gray-900"
+						>
+							Sign in
+						</Link>
+						<Link
+							href="/pre-lime"
+							className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-blue-700 dark:hover:bg-blue-500"
+						>
+							Try Model
+						</Link>
 
-              {/* Keep dropdown in DOM for transition */}
-              <div
-                role="menu"
-                aria-label="Docs"
-                className={`${styles.dropdown} ${
-                  docsOpen ? styles.open : ""
-                } absolute left-0 mt-2 w-48 bg-white border rounded shadow-lg z-20`}
-              >
-                <Link
-                  href="/docs/guides"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                  role="menuitem"
-                >
-                  Guides
-                </Link>
-                <Link
-                  href="/docs/api"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                  role="menuitem"
-                >
-                  API
-                </Link>
-                <Link
-                  href="/changelog"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                  role="menuitem"
-                >
-                  Changelog
-                </Link>
-              </div>
-            </div>
-          </div>
+						{/* Mobile menu button */}
+						<button
+							aria-expanded={mobileOpen}
+							aria-label="Open menu"
+							className="md:hidden rounded-lg p-2 text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+							onClick={() => setMobileOpen(!mobileOpen)}
+						>
+							<svg
+								className="h-6 w-6"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								{mobileOpen ? (
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M6 18L18 6M6 6l12 12"
+									/>
+								) : (
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M4 6h16M4 12h16M4 18h16"
+									/>
+								)}
+							</svg>
+						</button>
+					</div>
+				</nav>
 
-          {/* Right: actions + mobile menu button */}
-          <div className="flex items-center space-x-3">
-            <Link
-              href="/signin"
-              className="hidden md:inline text-sm text-gray-600 hover:text-gray-900"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/get-started"
-              className="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md shadow-sm hover:bg-indigo-700"
-            >
-              Get started
-            </Link>
-
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setMobileOpen((s) => !s)}
-              aria-controls="mobile-menu"
-              aria-expanded={mobileOpen}
-              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <span className="sr-only">Open main menu</span>
-
-              {/* icons: show/hide */}
-              <svg
-                className={`${mobileOpen ? "hidden" : "block"} w-6 h-6`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-              <svg
-                className={`${mobileOpen ? "block" : "hidden"} w-6 h-6`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-        </nav>
-      </div>
-
-      {/* Mobile menu - keep in DOM for transitions */}
-      <div
-        id="mobile-menu"
-        className={`${styles.mobileMenu} md:hidden border-t bg-white ${
-          mobileOpen ? styles.mobileOpen : ""
-        }`}
-      >
-        <div className="px-4 pt-4 pb-3 space-y-1">
-          <Link
-            href="/"
-            onClick={() => setMobileOpen(false)}
-            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Home
-          </Link>
-          <Link
-            href="/features"
-            onClick={() => setMobileOpen(false)}
-            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Features
-          </Link>
-          <Link
-            href="/pricing"
-            onClick={() => setMobileOpen(false)}
-            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Pricing
-          </Link>
-
-          <button
-            onClick={() => setDocsOpen((s) => !s)}
-            className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Docs
-          </button>
-
-          {/* nested mobile docs */}
-          <div className={`${docsOpen ? "block" : "hidden"} pl-4`}>
-            <Link
-              href="/docs/guides"
-              onClick={() => setMobileOpen(false)}
-              className="block px-3 py-2 rounded-md text-base text-gray-700 hover:bg-gray-50"
-            >
-              Guides
-            </Link>
-            <Link
-              href="/docs/api"
-              onClick={() => setMobileOpen(false)}
-              className="block px-3 py-2 rounded-md text-base text-gray-700 hover:bg-gray-50"
-            >
-              API
-            </Link>
-          </div>
-
-          <Link
-            href="/get-started"
-            onClick={() => setMobileOpen(false)}
-            className="block px-3 py-2 rounded-md text-base font-medium text-indigo-600 hover:bg-gray-50"
-          >
-            Get started
-          </Link>
-          <Link
-            href="/signin"
-            onClick={() => setMobileOpen(false)}
-            className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50"
-          >
-            Sign in
-          </Link>
-        </div>
-      </div>
-    </header>
-  );
+				{/* Mobile menu */}
+				<div
+					className={`${
+						mobileOpen
+							? "block max-h-96 overflow-hidden"
+							: "hidden max-h-0 overflow-hidden"
+					} ${
+						styles.mobileMenu
+					} md:hidden border-t border-zinc-200 dark:border-zinc-700 transition-all duration-300 ease-in-out`}
+				>
+					<div className="space-y-1 px-2 py-4">
+						<Link
+							href="/"
+							className="block rounded-lg px-3 py-2 text-base font-medium text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+						>
+							Home
+						</Link>
+						<Link
+							href="/pre-lime"
+							className="block rounded-lg px-3 py-2 text-base font-medium text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+						>
+							Lime Dosing
+						</Link>
+						<Link
+							href="/#features"
+							className="block rounded-lg px-3 py-2 text-base font-medium text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+						>
+							Features
+						</Link>
+						<Link
+							href="/#about"
+							className="block rounded-lg px-3 py-2 text-base font-medium text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+						>
+							About
+						</Link>
+					</div>
+				</div>
+			</div>
+		</header>
+	);
 }
