@@ -41,6 +41,15 @@ def create_app():
     app.register_blueprint(post_lime_bp, url_prefix="/api/v1/post-lime")
     app.register_blueprint(history_bp, url_prefix="/api/v1/history")
 
+    from routes.classification_routes import classification_bp
+    from routes.advance_regression_routes import advance_regression_bp
+    from routes.normal_regression_routes import normal_regression_bp
+
+    app.register_blueprint(classification_bp, url_prefix="/api/v1/classify")
+    app.register_blueprint(advance_regression_bp, url_prefix="/api/v1/advance-regression")
+    app.register_blueprint(normal_regression_bp, url_prefix="/api/v1/normal-regression")
+
+
     # =========================
     # HEALTH CHECK
     # =========================
@@ -75,4 +84,4 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5001)
