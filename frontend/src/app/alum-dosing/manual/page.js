@@ -287,7 +287,7 @@ export default function ManualAlumDosingPage() {
 						>
 							<div className="rounded-lg border border-zinc-200 bg-white p-8 dark:border-zinc-700 dark:bg-zinc-900">
 								<h2 className="mb-6 text-2xl font-bold text-black dark:text-white">
-									Input Parameters
+									Configuration
 								</h2>
 
 								<form onSubmit={handlePredict} className="space-y-5">
