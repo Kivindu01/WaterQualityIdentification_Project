@@ -107,18 +107,15 @@ print("✅ Advance Regression model assets loaded")
 # NORMAL REGRESSION ASSETS
 # =========================
 
-normal_regression_model = _load_pickle(config.NORMAL_Regression_PIPELINE_MODEL_PATH)
-normal_regression_model_pipeline = _load_pickle(config.NORMAL_Regression_PIPELINE_PATH)
+normal_regression_model = _load_pickle(config.NORMAL_Regression_MODEL_PATH)
 normal_regression_conformal = _load_pickle(config.NORMAL_Regression_Conformal_MODEL_PATH)
 normal_regression_features = _load_pickle(config.NORMAL_Regression_FEATURE_PATH)
-normal_regression_training = _load_pickle(config.NORMAL_Regression_Training_Info_PATH)
-
+normal_regression_explainer = shap.TreeExplainer(normal_regression_model)
 normal_regression_assets = {
     "model": normal_regression_model,
-    "pipeline": normal_regression_model_pipeline,
+    "explainer": normal_regression_explainer,
     "conformal": normal_regression_conformal,
     "feature_names": normal_regression_features,
-    "training_info": normal_regression_training,
 }
 
 print("✅ Regression model assets loaded")
