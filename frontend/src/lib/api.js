@@ -146,14 +146,11 @@ export const API = {
 		rawWaterConductivity,
 	) => {
 		try {
-			const response = await apiClient.post(
-				"/classify/predict",
-				{
-					ph: parseFloat(rawWaterPH),
-					turbidity: parseFloat(rawWaterTurbidity),
-					conductivity: parseFloat(rawWaterConductivity),
-				},
-			);
+			const response = await apiClient.post("/classify/predict", {
+				ph: parseFloat(rawWaterPH),
+				turbidity: parseFloat(rawWaterTurbidity),
+				conductivity: parseFloat(rawWaterConductivity),
+			});
 			return response.data.data;
 		} catch (error) {
 			throw new Error(
@@ -171,14 +168,11 @@ export const API = {
 		rawWaterConductivity,
 	) => {
 		try {
-			const response = await apiClient.post(
-				"/normal-regression/predict",
-				{
-					ph: parseFloat(rawWaterPH),
-					turbidity: parseFloat(rawWaterTurbidity),
-					conductivity: parseFloat(rawWaterConductivity),
-				},
-			);
+			const response = await apiClient.post("/normal-regression/predict", {
+				ph: parseFloat(rawWaterPH),
+				turbidity: parseFloat(rawWaterTurbidity),
+				conductivity: parseFloat(rawWaterConductivity),
+			});
 			return response.data;
 		} catch (error) {
 			throw new Error(
@@ -199,17 +193,14 @@ export const API = {
 		aeratorFlow,
 	) => {
 		try {
-			const response = await apiClient.post(
-				"/advance-regression/predict",
-				{
-					ph: parseFloat(rawWaterPH),
-					turbidity: parseFloat(rawWaterTurbidity),
-					conductivity: parseFloat(rawWaterConductivity),
-					raw_water_flow: parseFloat(rawWaterFlow),
-					d_chamber_flow: parseFloat(dChamberFlow),
-					aerator_flow: parseFloat(aeratorFlow),
-				},
-			);
+			const response = await apiClient.post("/advance-regression/predict", {
+				ph: parseFloat(rawWaterPH),
+				turbidity: parseFloat(rawWaterTurbidity),
+				conductivity: parseFloat(rawWaterConductivity),
+				raw_water_flow: parseFloat(rawWaterFlow),
+				d_chamber_flow: parseFloat(dChamberFlow),
+				aerator_flow: parseFloat(aeratorFlow),
+			});
 			return response.data;
 		} catch (error) {
 			throw new Error(
@@ -217,6 +208,30 @@ export const API = {
 					error.message ||
 					"Failed to predict alum dosage with advanced model",
 			);
+		}
+	},
+
+	// Get Alum Dosing History (Advanced Model)
+	getAlumHistory: async (startDate, endDate) => {
+		try {
+			const response = await fetch(
+				`http://localhost:5001/api/v1/history/advance-regression?start_date=${startDate}&end_date=${endDate}`,
+			);
+			if (response.ok) {
+				const jsonData = await response.json();
+				if (jsonData.data && Array.isArray(jsonData.data)) {
+					return jsonData.data.map((item) => ({
+						created_at: item.created_at,
+						predicted_alum_dosage_ppm:
+							item.result?.predicted_alum_dosage_ppm || 0,
+						timestamp: new Date(item.created_at).getTime(),
+					}));
+				}
+			}
+			return [];
+		} catch (error) {
+			console.error("Error fetching alum history:", error);
+			return [];
 		}
 	},
 };
