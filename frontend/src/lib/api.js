@@ -138,6 +138,87 @@ export const API = {
 			);
 		}
 	},
+
+	// Classify Water Quality (Alum Dosing)
+	classifyWaterQuality: async (
+		rawWaterPH,
+		rawWaterTurbidity,
+		rawWaterConductivity,
+	) => {
+		try {
+			const response = await apiClient.post(
+				"/classify/predict",
+				{
+					ph: parseFloat(rawWaterPH),
+					turbidity: parseFloat(rawWaterTurbidity),
+					conductivity: parseFloat(rawWaterConductivity),
+				},
+			);
+			return response.data.data;
+		} catch (error) {
+			throw new Error(
+				error.response?.data?.message ||
+					error.message ||
+					"Failed to classify water quality",
+			);
+		}
+	},
+
+	// Alum Dose Prediction (3-Parameter Model)
+	predictAlumDoseBasic: async (
+		rawWaterPH,
+		rawWaterTurbidity,
+		rawWaterConductivity,
+	) => {
+		try {
+			const response = await apiClient.post(
+				"/normal-regression/predict",
+				{
+					ph: parseFloat(rawWaterPH),
+					turbidity: parseFloat(rawWaterTurbidity),
+					conductivity: parseFloat(rawWaterConductivity),
+				},
+			);
+			return response.data;
+		} catch (error) {
+			throw new Error(
+				error.response?.data?.message ||
+					error.message ||
+					"Failed to predict alum dosage",
+			);
+		}
+	},
+
+	// Alum Dose Prediction (6-Parameter Advanced Model)
+	predictAlumDoseAdvanced: async (
+		rawWaterPH,
+		rawWaterTurbidity,
+		rawWaterConductivity,
+		rawWaterFlow,
+		dChamberFlow,
+		aeratorFlow,
+	) => {
+		try {
+			const response = await apiClient.post(
+				"/advance-regression/predict",
+				{
+					ph: parseFloat(rawWaterPH),
+					turbidity: parseFloat(rawWaterTurbidity),
+					conductivity: parseFloat(rawWaterConductivity),
+					raw_water_flow: parseFloat(rawWaterFlow),
+					d_chamber_flow: parseFloat(dChamberFlow),
+					aerator_flow: parseFloat(aeratorFlow),
+				},
+			);
+			return response.data;
+		} catch (error) {
+			throw new Error(
+				error.response?.data?.message ||
+					error.message ||
+					"Failed to predict alum dosage with advanced model",
+			);
+		}
+	},
 };
 
 export default apiClient;
