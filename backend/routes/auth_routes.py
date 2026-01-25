@@ -14,7 +14,7 @@ def register():
         email = data["email"]
         password = data["password"]
 
-        # ✅ validate password HERE
+        #  validate password HERE
         validate_password(password)
 
         result = register_user(email, password)
