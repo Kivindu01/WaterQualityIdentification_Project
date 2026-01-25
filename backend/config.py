@@ -105,6 +105,6 @@ NORMAL_Regression_Conformal_MODEL_PATH = os.path.join(
 NORMAL_Regression_FEATURE_PATH = os.path.join(
     MODELS_DIR, "Regression", "turbidity_features.pkl"
 )
-NORMAL_Regression_Explainer_PATH = os.path.join(
-    MODELS_DIR, "Regression", "shap_explainer.pkl"
-)
+# NORMAL_Regression_Explainer_PATH = os.path.join(
+#     MODELS_DIR, "Regression", "shap_explainer.pkl"
+# )
