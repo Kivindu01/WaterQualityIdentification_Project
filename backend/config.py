@@ -102,7 +102,7 @@ Advance_Regression_Conformal_MODEL_PATH = os.path.join(
 )
 
 # -------- Normal-Regression-Models --------
-NORMAL_Regression_PIPELINE_MODEL_PATH = os.path.join(
+NORMAL_Regression_MODEL_PATH = os.path.join(
     MODELS_DIR, "Regression", "turbidity_model.pkl"
 )
 NORMAL_Regression_Conformal_MODEL_PATH = os.path.join(
@@ -111,9 +111,6 @@ NORMAL_Regression_Conformal_MODEL_PATH = os.path.join(
 NORMAL_Regression_FEATURE_PATH = os.path.join(
     MODELS_DIR, "Regression", "turbidity_features.pkl"
 )
-NORMAL_Regression_PIPELINE_PATH = os.path.join(
-    MODELS_DIR, "Regression", "turbidity_pipeline.pkl"
-)
-NORMAL_Regression_Training_Info_PATH = os.path.join(
-    MODELS_DIR, "Regression", "turbidity_training_info.pkl"
-)
+# NORMAL_Regression_Explainer_PATH = os.path.join(
+#     MODELS_DIR, "Regression", "shap_explainer.pkl"
+# )
