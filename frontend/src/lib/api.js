@@ -9,6 +9,37 @@ const apiClient = axios.create({
 	timeout: 30000, // 30 seconds timeout
 });
 
+// Request interceptor to add token to all requests
+apiClient.interceptors.request.use(
+	(config) => {
+		const token = localStorage.getItem("access_token");
+		if (token) {
+			config.headers.Authorization = `Bearer ${token}`;
+		}
+		return config;
+	},
+	(error) => {
+		return Promise.reject(error);
+	},
+);
+
+// Response interceptor to handle 401 errors
+apiClient.interceptors.response.use(
+	(response) => response,
+	(error) => {
+		if (error.response?.status === 401) {
+			// Clear auth data and redirect to login
+			localStorage.removeItem("access_token");
+			localStorage.removeItem("user");
+			// Use window.location for redirect (works in Next.js client components)
+			if (typeof window !== "undefined") {
+				window.location.href = "/login";
+			}
+		}
+		return Promise.reject(error);
+	},
+);
+
 // API Endpoints
 export const API = {
 	// Pre-Lime Dosing
@@ -214,24 +245,16 @@ export const API = {
 	// Get Alum Dosing History (Advanced Model)
 	getAlumHistory: async (startDate, endDate) => {
 		try {
-			const response = await fetch(
-				`http://localhost:5001/api/v1/history/advance-regression?start_date=${startDate}&end_date=${endDate}`,
-			);
-			if (response.ok) {
-				const jsonData = await response.json();
-				if (jsonData.data && Array.isArray(jsonData.data)) {
-					return jsonData.data.map((item) => ({
-						created_at: item.created_at,
-						predicted_alum_dosage_ppm:
-							item.result?.predicted_alum_dosage_ppm || 0,
-						timestamp: new Date(item.created_at).getTime(),
-					}));
-				}
-			}
-			return [];
+			const response = await apiClient.get("/history/advance-regression", {
+				params: { start_date: startDate, end_date: endDate },
+			});
+			return response.data.data || [];
 		} catch (error) {
-			console.error("Error fetching alum history:", error);
-			return [];
+			throw new Error(
+				error.response?.data?.message ||
+					error.message ||
+					"Failed to fetch alum history",
+			);
 		}
 	},
 };

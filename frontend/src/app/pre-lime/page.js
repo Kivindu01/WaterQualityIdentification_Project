@@ -304,10 +304,6 @@ export default function PreLimePage() {
 				postLimeFormData.rawWaterConductivity,
 			);
 
-			// Check for spike detection (pH < 6.8 or pH > 7.2)
-			const isSpike =
-				parseFloat(result.final_ph) < 6.8 || parseFloat(result.final_ph) > 7.2;
-
 			setPostLimePredictions({
 				recommendedDose: result.recommended_dose?.toFixed(1) || "0",
 				finalPH: result.final_ph?.toFixed(2) || "0",
@@ -317,7 +313,9 @@ export default function PreLimePage() {
 						).toFixed(2)
 					: "0.18",
 				inputs: { ...postLimeFormData },
-				isSpike,
+				isSpike:
+					parseFloat(result.final_ph) < 6.8 ||
+					parseFloat(result.final_ph) > 7.2,
 				explanation:
 					"The post-lime dosing model analyzes the input raw water parameters to predict the optimal lime dosage required for pH stabilization. Based on the current raw water pH of " +
 					postLimeFormData.rawWaterPH +

@@ -75,13 +75,19 @@ export default function ManualAlumDosingPage() {
 		const fetchHistoricalData = async () => {
 			try {
 				setHistoryLoading(true);
-				const chartData = await API.getAlumHistory(startDate, endDate);
+				const rawData = await API.getAlumHistory(startDate, endDate);
+
+				const chartData = Array.isArray(rawData)
+					? rawData.map((item) => ({
+							created_at: item.created_at,
+							predicted_alum_dosage_ppm:
+								item.result?.predicted_alum_dosage_ppm || 0,
+							timestamp: new Date(item.created_at).getTime(),
+						}))
+					: [];
+
+				setHistoricalData(chartData.sort((a, b) => a.timestamp - b.timestamp));
 				setHistoryLoading(false);
-				if (chartData.length > 0) {
-					setHistoricalData(
-						chartData.sort((a, b) => a.timestamp - b.timestamp),
-					);
-				}
 			} catch (err) {
 				console.error("Error fetching historical data:", err);
 				setHistoryLoading(false);
@@ -94,13 +100,22 @@ export default function ManualAlumDosingPage() {
 	const fetchHistoricalData = async () => {
 		try {
 			setHistoryLoading(true);
-			const chartData = await API.getAlumHistory(startDate, endDate);
-			setHistoryLoading(false);
-			if (chartData.length > 0) {
-				setHistoricalData(chartData.sort((a, b) => a.timestamp - b.timestamp));
-			}
+			const rawData = await API.getAlumHistory(startDate, endDate);
+
+			const chartData = Array.isArray(rawData)
+				? rawData.map((item) => ({
+						created_at: item.created_at,
+						predicted_alum_dosage_ppm:
+							item.result?.predicted_alum_dosage_ppm || 0,
+						timestamp: new Date(item.created_at).getTime(),
+					}))
+				: [];
+
+			setHistoricalData(chartData.sort((a, b) => a.timestamp - b.timestamp));
 		} catch (err) {
 			console.error("Error fetching historical data:", err);
+			setHistoryLoading(false);
+		} finally {
 			setHistoryLoading(false);
 		}
 	};
@@ -1223,7 +1238,7 @@ export default function ManualAlumDosingPage() {
 									)}
 								</div>
 							</motion.div>
-						) : (
+						) : !predictions?.isAdvanced && (
 							<motion.div
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
@@ -1360,7 +1375,7 @@ export default function ManualAlumDosingPage() {
 									</motion.div>
 								)}
 							</motion.div>
-						)}
+						) }
 					</div>
 				</div>
 			</section>
