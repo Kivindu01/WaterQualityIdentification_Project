@@ -1,6 +1,7 @@
 from datetime import datetime
-from database.mongo import get_database
 from typing import Optional
+from database.mongo import get_database
+
 
 # =========================
 # COLLECTION NAMES
@@ -9,39 +10,82 @@ from typing import Optional
 PRE_LIME_COLLECTION = "pre_lime_predictions"
 POST_LIME_COLLECTION = "post_lime_predictions"
 
+CLASSIFICATION_COLLECTION = "classification_predictions"
+ADVANCE_REGRESSION_COLLECTION = "advance_regression_predictions"
+NORMAL_REGRESSION_COLLECTION = "normal_regression_predictions"
+
+
+# =========================
+# GENERIC SAVE HELPER
+# =========================
+
+def _save_record(collection_name: str, record: dict) -> str:
+    db = get_database()
+    collection = db[collection_name]
+
+    record["created_at"] = datetime.utcnow()
+
+    result = collection.insert_one(record)
+    return str(result.inserted_id)
+
 
 # =========================
 # SAVE FUNCTIONS
 # =========================
 
 def save_pre_lime_prediction(record: dict) -> str:
-    """
-    Save a pre-lime prediction record to MongoDB.
-    """
-    db = get_database()
-    collection = db[PRE_LIME_COLLECTION]
-
-    record["created_at"] = datetime.utcnow()
-
-    result = collection.insert_one(record)
-    return str(result.inserted_id)
+    return _save_record(PRE_LIME_COLLECTION, record)
 
 
 def save_post_lime_prediction(record: dict) -> str:
-    """
-    Save a post-lime prediction record to MongoDB.
-    """
-    db = get_database()
-    collection = db[POST_LIME_COLLECTION]
+    return _save_record(POST_LIME_COLLECTION, record)
 
-    record["created_at"] = datetime.utcnow()
 
-    result = collection.insert_one(record)
-    return str(result.inserted_id)
+def save_classification_prediction(record: dict) -> str:
+    return _save_record(CLASSIFICATION_COLLECTION, record)
+
+
+def save_advance_regression_prediction(record: dict) -> str:
+    return _save_record(ADVANCE_REGRESSION_COLLECTION, record)
+
+
+def save_normal_regression_prediction(record: dict) -> str:
+    return _save_record(NORMAL_REGRESSION_COLLECTION, record)
 
 
 # =========================
-# FETCH FUNCTIONS (WITH DATE RANGE SUPPORT)
+# GENERIC FETCH HELPER
+# =========================
+
+def _fetch_history(
+    collection_name: str,
+    start_date: Optional[datetime] = None,
+    end_date: Optional[datetime] = None,
+    limit: int = 100
+):
+    db = get_database()
+    collection = db[collection_name]
+
+    query = {}
+
+    if start_date and end_date:
+        query["created_at"] = {
+            "$gte": start_date,
+            "$lte": end_date
+        }
+
+    records = (
+        collection
+        .find(query, {"_id": 0})
+        .sort("created_at", -1)
+        .limit(limit)
+    )
+
+    return list(records)
+
+
+# =========================
+# FETCH HISTORY FUNCTIONS
 # =========================
 
 def fetch_pre_lime_history(
@@ -49,32 +93,9 @@ def fetch_pre_lime_history(
     end_date: Optional[datetime] = None,
     limit: int = 100
 ):
-    """
-    Fetch pre-lime prediction history.
-
-    Optional filters:
-    - start_date (datetime)
-    - end_date (datetime)
-    """
-    db = get_database()
-    collection = db[PRE_LIME_COLLECTION]
-
-    query = {}
-
-    if start_date and end_date:
-        query["created_at"] = {
-            "$gte": start_date,
-            "$lte": end_date
-        }
-
-    records = (
-        collection
-        .find(query, {"_id": 0})
-        .sort("created_at", -1)
-        .limit(limit)
+    return _fetch_history(
+        PRE_LIME_COLLECTION, start_date, end_date, limit
     )
-
-    return list(records)
 
 
 def fetch_post_lime_history(
@@ -82,29 +103,36 @@ def fetch_post_lime_history(
     end_date: Optional[datetime] = None,
     limit: int = 100
 ):
-    """
-    Fetch post-lime prediction history.
-
-    Optional filters:
-    - start_date (datetime)
-    - end_date (datetime)
-    """
-    db = get_database()
-    collection = db[POST_LIME_COLLECTION]
-
-    query = {}
-
-    if start_date and end_date:
-        query["created_at"] = {
-            "$gte": start_date,
-            "$lte": end_date
-        }
-
-    records = (
-        collection
-        .find(query, {"_id": 0})
-        .sort("created_at", -1)
-        .limit(limit)
+    return _fetch_history(
+        POST_LIME_COLLECTION, start_date, end_date, limit
     )
 
-    return list(records)
+
+def fetch_classification_history(
+    start_date: Optional[datetime] = None,
+    end_date: Optional[datetime] = None,
+    limit: int = 100
+):
+    return _fetch_history(
+        CLASSIFICATION_COLLECTION, start_date, end_date, limit
+    )
+
+
+def fetch_advance_regression_history(
+    start_date: Optional[datetime] = None,
+    end_date: Optional[datetime] = None,
+    limit: int = 100
+):
+    return _fetch_history(
+        ADVANCE_REGRESSION_COLLECTION, start_date, end_date, limit
+    )
+
+
+def fetch_normal_regression_history(
+    start_date: Optional[datetime] = None,
+    end_date: Optional[datetime] = None,
+    limit: int = 100
+):
+    return _fetch_history(
+        NORMAL_REGRESSION_COLLECTION, start_date, end_date, limit
+    )

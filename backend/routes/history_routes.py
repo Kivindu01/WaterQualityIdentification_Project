@@ -2,9 +2,12 @@ from flask import Blueprint, request
 from datetime import datetime
 from database.repositories import (
     fetch_pre_lime_history,
-    fetch_post_lime_history
+    fetch_post_lime_history,
+    fetch_advance_regression_history,
+    fetch_normal_regression_history
 )
 from utils.response_builder import success_response, error_response
+from flask_jwt_extended import jwt_required
 
 history_bp = Blueprint("history", __name__)
 
@@ -27,7 +30,9 @@ def parse_date(date_str: str) -> datetime:
 # PRE-LIME HISTORY
 # =========================
 
+
 @history_bp.route("/pre-lime", methods=["GET"])
+@jwt_required()
 def get_pre_lime_history():
     try:
         start_date = request.args.get("start_date")
@@ -57,6 +62,7 @@ def get_pre_lime_history():
 # =========================
 
 @history_bp.route("/post-lime", methods=["GET"])
+@jwt_required()
 def get_post_lime_history():
     try:
         start_date = request.args.get("start_date")
@@ -73,6 +79,56 @@ def get_post_lime_history():
         )
 
         return success_response(records, "Post-lime history fetched")
+
+    except ValueError as ve:
+        return error_response(str(ve), 400)
+
+    except Exception as e:
+        return error_response(str(e), 500)
+
+@history_bp.route("/advance-regression", methods=["GET"])
+@jwt_required()
+def get_advance_regression_history():
+    try:
+        start_date = request.args.get("start_date")
+        end_date = request.args.get("end_date")
+        limit = int(request.args.get("limit", 50))
+
+        start_dt = parse_date(start_date) if start_date else None
+        end_dt = parse_date(end_date) if end_date else None
+
+        records = fetch_advance_regression_history(
+            start_date=start_dt,
+            end_date=end_dt,
+            limit=limit
+        )
+
+        return success_response(records, "advance regression history fetched")
+
+    except ValueError as ve:
+        return error_response(str(ve), 400)
+
+    except Exception as e:
+        return error_response(str(e), 500)
+
+@history_bp.route("/normal-regression", methods=["GET"])
+@jwt_required()    
+def get_normal_regression_history():
+    try:
+        start_date = request.args.get("start_date")
+        end_date = request.args.get("end_date")
+        limit = int(request.args.get("limit", 50))
+
+        start_dt = parse_date(start_date) if start_date else None
+        end_dt = parse_date(end_date) if end_date else None
+
+        records = fetch_normal_regression_history(
+            start_date=start_dt,
+            end_date=end_dt,
+            limit=limit
+        )
+
+        return success_response(records, "normal regression history fetched")
 
     except ValueError as ve:
         return error_response(str(ve), 400)

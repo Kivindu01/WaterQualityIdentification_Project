@@ -39,6 +39,12 @@ MONGODB_URI = (
 )
 
 # =========================
+# JWT CONFIG
+# =========================
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "super-secret-key")
+JWT_ACCESS_TOKEN_EXPIRES = 3600  # 1 hour
+
+# =========================
 # MODEL PATHS (PHASE 3)
 # =========================
 
@@ -72,3 +78,39 @@ POST_LIME_EXPLAINER_PATH = os.path.join(
 POST_LIME_CONFORMAL_PATH = os.path.join(
     MODELS_DIR, "postlime", "post_lime_conformal.pkl"
 )
+
+# -------- Classification-Models --------
+CLASSIFICATION_MODEL_PATH = os.path.join(
+    MODELS_DIR, "Classification", "rf_binary_safety_model.pkl"
+)
+CLASSIFICATION_THRESHOLD_PATH = os.path.join(
+    MODELS_DIR, "Classification", "rf_safety_threshold.pkl"
+)
+CLASSIFICATION_FEATURE_ORDER_PATH = os.path.join(
+    MODELS_DIR, "Classification", "rf_feature_order.pkl"
+)
+
+# -------- Advance-Regression-Models --------
+Advance_Regression_MODEL_PATH = os.path.join(
+    MODELS_DIR, "AdvaceRegression", "alum_dosage_model.pkl"
+)
+Advance_Regression_Explainer_MODEL_PATH = os.path.join(
+    MODELS_DIR, "AdvaceRegression", "alum_dosage_explainer.pkl"
+)
+Advance_Regression_Conformal_MODEL_PATH = os.path.join(
+    MODELS_DIR, "AdvaceRegression", "alum_conformal.pkl"
+)
+
+# -------- Normal-Regression-Models --------
+NORMAL_Regression_MODEL_PATH = os.path.join(
+    MODELS_DIR, "Regression", "turbidity_model.pkl"
+)
+NORMAL_Regression_Conformal_MODEL_PATH = os.path.join(
+    MODELS_DIR, "Regression", "turbidity_conformal.pkl"
+)
+NORMAL_Regression_FEATURE_PATH = os.path.join(
+    MODELS_DIR, "Regression", "turbidity_features.pkl"
+)
+# NORMAL_Regression_Explainer_PATH = os.path.join(
+#     MODELS_DIR, "Regression", "shap_explainer.pkl"
+# )

@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/context/AuthContext";
 
 const MotionSection = ({ children, className }) => {
 	const { ref, inView } = useInView({ threshold: 0.3 });
@@ -54,16 +56,27 @@ const components = [
 
 export default function Home() {
 	const [activeTab, setActiveTab] = useState(0);
+	const router = useRouter();
+	const { user } = useAuth();
+
+	const handleManualModeClick = (path) => {
+		if (!user) {
+			router.push("/login");
+		} else {
+			router.push(path);
+		}
+	};
 
 	return (
 		<div className="relative min-h-screen overflow-hidden bg-white dark:bg-black">
 			{/* Background Image */}
 			<div
-				className="absolute inset-0 opacity-5 dark:opacity-10"
+				className="absolute inset-0 opacity-10 dark:opacity-20"
 				style={{
-					backgroundImage: `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><pattern id="water" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M0,50 Q25,40 50,50 T100,50" fill="none" stroke="%23666" stroke-width="2"/><circle cx="30" cy="70" r="3" fill="%23666" opacity="0.5"/><circle cx="70" cy="80" r="2" fill="%23666" opacity="0.5"/></pattern></defs><rect width="1200" height="600" fill="url(%23water)"/></svg>')`,
+					backgroundImage: `url('/images/background.jpg')`,
 					backgroundSize: "cover",
 					backgroundPosition: "center",
+					backgroundAttachment: "fixed",
 				}}
 			/>
 
@@ -109,7 +122,7 @@ export default function Home() {
 								Try the Model
 							</a>
 							<a
-								href="/docs"
+								href="/about"
 								className="inline-flex items-center rounded-lg border-2 border-zinc-300 px-8 py-4 text-base font-semibold text-zinc-900 transition-all hover:bg-zinc-100 dark:border-zinc-700 dark:text-white dark:hover:bg-zinc-900"
 							>
 								Learn More
@@ -186,14 +199,18 @@ export default function Home() {
 									{/* Lime Dosing and Alum Dose - Show Manual/Automatic buttons */}
 									{activeTab === 2 || activeTab === 3 ? (
 										<div className="mt-6 flex flex-wrap gap-3">
-											<a
-												href={
-													activeTab === 3 ? "/pre-lime" : "/alum-dosing/manual"
+											<button
+												onClick={() =>
+													handleManualModeClick(
+														activeTab === 3
+															? "/pre-lime"
+															: "/alum-dosing/manual"
+													)
 												}
 												className="inline-flex items-center rounded-lg bg-blue-600 px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-blue-700"
 											>
 												📋 Manual Mode
-											</a>
+											</button>
 											<button
 												disabled
 												className="inline-flex items-center rounded-lg border-2 border-blue-600 px-6 py-2 text-sm font-semibold text-blue-600 transition-all opacity-60 cursor-not-allowed dark:border-blue-400 dark:text-blue-400"

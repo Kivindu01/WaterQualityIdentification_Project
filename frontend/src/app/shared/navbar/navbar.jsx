@@ -1,8 +1,11 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import styles from "./Navbar.module.css";
+import { useAuth } from "@/app/context/AuthContext";
 
 /**
  * components/Navbar.jsx
@@ -13,6 +16,8 @@ import styles from "./Navbar.module.css";
 export default function Navbar() {
 	const [mobileOpen, setMobileOpen] = useState(false);
 	const docsRef = useRef(null);
+	const router = useRouter();
+	const { user, logout } = useAuth();
 
 	// Close dropdown when clicking outside
 	useEffect(() => {
@@ -46,11 +51,15 @@ export default function Navbar() {
 					{/* Left: brand */}
 					<div className="flex items-center">
 						<Link href="/" className="flex items-center space-x-3 group">
-							<div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-cyan-600">
-								<span className="text-sm font-bold text-white">WQ</span>
-							</div>
+							<Image
+								src="/images/logo.png"
+								alt="HydroMind Logo"
+								width={36}
+								height={36}
+								className="rounded-lg"
+							/>
 							<span className="font-bold text-lg text-black dark:text-white">
-								Water Quality
+								HydroMind
 							</span>
 						</Link>
 					</div>
@@ -85,15 +94,32 @@ export default function Navbar() {
 
 					{/* Right: actions + mobile menu button */}
 					<div className="flex items-center space-x-3">
+						{user ? (
+							<>
+								<span className="hidden md:inline text-sm text-zinc-600 dark:text-zinc-400">
+									{user.email}
+								</span>
+								<button
+									onClick={() => {
+										logout();
+										router.push("/");
+									}}
+									className="hidden md:inline rounded-lg px-4 py-2 text-sm font-semibold text-blue-600 transition-all hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
+								>
+									Sign Out
+								</button>
+							</>
+						) : (
+							<Link
+								href="/login"
+								className="hidden md:inline rounded-lg px-4 py-2 text-sm font-semibold text-blue-600 transition-all hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
+							>
+								Sign in
+							</Link>
+						)}
 						<Link
-							href="/signin"
-							className="hidden md:inline text-sm text-gray-600 hover:text-gray-900"
-						>
-							Sign in
-						</Link>
-						<Link
-							href="/pre-lime"
-							className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-blue-700 dark:hover:bg-blue-500"
+							href={user ? "/pre-lime" : "/login"}
+							className="hidden md:inline rounded-lg bg-blue-600 px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-blue-700"
 						>
 							Try Model
 						</Link>

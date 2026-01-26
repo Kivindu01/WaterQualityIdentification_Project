@@ -1,5 +1,6 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 import config
 
 
@@ -14,10 +15,19 @@ def create_app():
     app.config["APP_NAME"] = config.APP_NAME
     app.config["API_VERSION"] = config.API_VERSION
 
+    #  JWT CONFIG
+    app.config["JWT_SECRET_KEY"] = config.JWT_SECRET_KEY
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = config.JWT_ACCESS_TOKEN_EXPIRES
+
     # =========================
     # ENABLE CORS
     # =========================
     CORS(app)
+
+    # =========================
+    # INIT JWT
+    # =========================
+    jwt = JWTManager(app)
 
     # =========================
     # INITIALIZE DATABASE (FAIL FAST)
@@ -40,6 +50,18 @@ def create_app():
     app.register_blueprint(pre_lime_bp, url_prefix="/api/v1/pre-lime")
     app.register_blueprint(post_lime_bp, url_prefix="/api/v1/post-lime")
     app.register_blueprint(history_bp, url_prefix="/api/v1/history")
+
+    from routes.classification_routes import classification_bp
+    from routes.advance_regression_routes import advance_regression_bp
+    from routes.normal_regression_routes import normal_regression_bp
+
+    app.register_blueprint(classification_bp, url_prefix="/api/v1/classify")
+    app.register_blueprint(advance_regression_bp, url_prefix="/api/v1/advance-regression")
+    app.register_blueprint(normal_regression_bp, url_prefix="/api/v1/normal-regression")
+
+    #  AUTH ROUTES
+    from routes.auth_routes import auth_bp
+    app.register_blueprint(auth_bp, url_prefix="/api/v1/auth")
 
     # =========================
     # HEALTH CHECK
@@ -75,4 +97,4 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5001)
