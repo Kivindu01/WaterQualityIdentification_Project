@@ -6,17 +6,21 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
 	const [user, setUser] = useState(null);
+	const [token, setToken] = useState(null);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		// Check if user is already logged in
+		// Check if user and token are already logged in
 		const savedUser = localStorage.getItem("user");
-		if (savedUser) {
+		const savedToken = localStorage.getItem("access_token");
+		if (savedUser && savedToken) {
 			try {
 				setUser(JSON.parse(savedUser));
+				setToken(savedToken);
 			} catch (error) {
-				console.error("Failed to parse user from localStorage:", error);
+				console.error("Failed to parse user/token from localStorage:", error);
 				localStorage.removeItem("user");
+				localStorage.removeItem("access_token");
 			}
 		}
 		setLoading(false);
@@ -24,15 +28,29 @@ export function AuthProvider({ children }) {
 
 	const register = async (email, password, name) => {
 		try {
-			// Mock registration - in production, call your API
-			const newUser = {
-				id: Date.now().toString(),
-				email,
-				name,
-				createdAt: new Date().toISOString(),
-			};
-			localStorage.setItem("user", JSON.stringify(newUser));
-			setUser(newUser);
+			const response = await fetch(
+				"http://localhost:5001/api/v1/auth/register",
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						email,
+						password,
+					}),
+				},
+			);
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				return {
+					success: false,
+					error: errorData.message || "Registration failed",
+				};
+			}
+
+			const data = await response.json();
 			return { success: true };
 		} catch (error) {
 			console.error("Registration error:", error);
@@ -42,16 +60,40 @@ export function AuthProvider({ children }) {
 
 	const login = async (email, password) => {
 		try {
-			// Mock login - in production, call your API
-			// For now, accept any email/password combination
-			const user = {
-				id: Date.now().toString(),
-				email,
-				name: email.split("@")[0],
+			const response = await fetch("http://localhost:5001/api/v1/auth/login", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					email,
+					password,
+				}),
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				return {
+					success: false,
+					error: errorData.message || "Login failed",
+				};
+			}
+
+			const data = await response.json();
+			const accessToken = data.data.access_token;
+			const userEmail = data.data.email;
+
+			const userData = {
+				email: userEmail,
+				name: userEmail.split("@")[0],
 				loginTime: new Date().toISOString(),
 			};
-			localStorage.setItem("user", JSON.stringify(user));
-			setUser(user);
+
+			localStorage.setItem("user", JSON.stringify(userData));
+			localStorage.setItem("access_token", accessToken);
+			setUser(userData);
+			setToken(accessToken);
+
 			return { success: true };
 		} catch (error) {
 			console.error("Login error:", error);
@@ -61,11 +103,15 @@ export function AuthProvider({ children }) {
 
 	const logout = () => {
 		localStorage.removeItem("user");
+		localStorage.removeItem("access_token");
 		setUser(null);
+		setToken(null);
 	};
 
 	return (
-		<AuthContext.Provider value={{ user, loading, login, register, logout }}>
+		<AuthContext.Provider
+			value={{ user, token, loading, login, register, logout }}
+		>
 			{children}
 		</AuthContext.Provider>
 	);

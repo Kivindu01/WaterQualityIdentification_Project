@@ -7,6 +7,7 @@ from database.repositories import (
     fetch_normal_regression_history
 )
 from utils.response_builder import success_response, error_response
+from flask_jwt_extended import jwt_required
 
 history_bp = Blueprint("history", __name__)
 
@@ -29,7 +30,9 @@ def parse_date(date_str: str) -> datetime:
 # PRE-LIME HISTORY
 # =========================
 
+
 @history_bp.route("/pre-lime", methods=["GET"])
+@jwt_required()
 def get_pre_lime_history():
     try:
         start_date = request.args.get("start_date")
@@ -59,6 +62,7 @@ def get_pre_lime_history():
 # =========================
 
 @history_bp.route("/post-lime", methods=["GET"])
+@jwt_required()
 def get_post_lime_history():
     try:
         start_date = request.args.get("start_date")
@@ -83,6 +87,7 @@ def get_post_lime_history():
         return error_response(str(e), 500)
 
 @history_bp.route("/advance-regression", methods=["GET"])
+@jwt_required()
 def get_advance_regression_history():
     try:
         start_date = request.args.get("start_date")
@@ -105,8 +110,9 @@ def get_advance_regression_history():
 
     except Exception as e:
         return error_response(str(e), 500)
-    
+
 @history_bp.route("/normal-regression", methods=["GET"])
+@jwt_required()    
 def get_normal_regression_history():
     try:
         start_date = request.args.get("start_date")
