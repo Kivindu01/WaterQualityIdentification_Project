@@ -122,7 +122,7 @@ export default function Home() {
 								Try the Model
 							</a>
 							<a
-								href="/docs"
+								href="/about"
 								className="inline-flex items-center rounded-lg border-2 border-zinc-300 px-8 py-4 text-base font-semibold text-zinc-900 transition-all hover:bg-zinc-100 dark:border-zinc-700 dark:text-white dark:hover:bg-zinc-900"
 							>
 								Learn More
