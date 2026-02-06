@@ -59,14 +59,16 @@ export const API = {
 			const data = response.data.data;
 			return {
 				recommended_dose: data.recommended_dose_ppm,
-				settled_turbidity: data.predicted_settled_pH,
+				settled_ph: data.predicted_settled_pH,
 				conformal_interval: {
 					lower: data.conformal_interval.lower_pH,
 					upper: data.conformal_interval.upper_pH,
 				},
 				safe_band: data.safe_band,
 				shap_explanation: data.shap_explanation,
+				explanation: data.ambatale_explanation_pre, 
 			};
+
 		} catch (error) {
 			throw new Error(
 				error.response?.data?.message ||
@@ -100,6 +102,7 @@ export const API = {
 				},
 				safe_band: data.safe_band,
 				shap_explanation: data.shap_explanation,
+				explanation: data.ambatale_explanation_post,
 			};
 		} catch (error) {
 			throw new Error(

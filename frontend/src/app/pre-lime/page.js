@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -246,7 +247,7 @@ export default function PreLimePage() {
 
 			setPredictions({
 				recommendedDose: result.recommended_dose?.toFixed(1) || "0",
-				settledPH: result.settled_turbidity?.toFixed(1) || "0",
+				settledPH: result.settled_ph?.toFixed(1) || "0",
 				conformalInterval: result.conformal_interval?.upper
 					? (
 							result.conformal_interval.upper - result.conformal_interval.lower
@@ -254,25 +255,9 @@ export default function PreLimePage() {
 					: "0.15",
 				inputs: { ...formData },
 				isSpike:
-					parseFloat(result.settled_turbidity) < 6.0 ||
-					parseFloat(result.settled_turbidity) > 6.6,
-				explanation:
-					"The pre-lime dosing model analyzes the input raw water parameters to predict the optimal lime dosage required to achieve the target settled pH. Based on the current raw water pH of " +
-					formData.rawWaterPH +
-					" and turbidity of " +
-					formData.rawWaterTurbidity +
-					" NTU, the model recommends " +
-					result.recommended_dose?.toFixed(1) +
-					" mg/L of pre-lime. This dosage is expected to result in a settled pH of approximately " +
-					result.settled_turbidity?.toFixed(1) +
-					" with a conformal prediction interval of ±" +
-					(result.conformal_interval?.upper
-						? (
-								result.conformal_interval.upper -
-								result.conformal_interval.lower
-							).toFixed(2)
-						: "0.15") +
-					" pH. The model uses machine learning trained on historical water treatment data to provide this recommendation.",
+					parseFloat(result.settled_ph) < 6.0 ||
+					parseFloat(result.settled_ph) > 6.6,
+				explanation: result.explanation, 
 			});
 		} catch (err) {
 			setError(err.message || "Failed to make prediction. Please try again.");
@@ -316,23 +301,7 @@ export default function PreLimePage() {
 				isSpike:
 					parseFloat(result.final_ph) < 6.8 ||
 					parseFloat(result.final_ph) > 7.2,
-				explanation:
-					"The post-lime dosing model analyzes the input raw water parameters to predict the optimal lime dosage required for pH stabilization. Based on the current raw water pH of " +
-					postLimeFormData.rawWaterPH +
-					" and turbidity of " +
-					postLimeFormData.rawWaterTurbidity +
-					" NTU, the model recommends " +
-					result.recommended_dose?.toFixed(1) +
-					" mg/L of post-lime. This dosage is expected to result in a final pH of approximately " +
-					result.final_ph?.toFixed(2) +
-					" with a conformal prediction interval of ±" +
-					(result.conformal_interval?.upper
-						? (
-								result.conformal_interval.upper -
-								result.conformal_interval.lower
-							).toFixed(2)
-						: "0.18") +
-					" pH. The model uses machine learning trained on historical water treatment data to provide this recommendation.",
+				explanation: result.explanation,
 			});
 		} catch (err) {
 			setPostLimeError(
