@@ -73,6 +73,12 @@ export default function Navbar() {
 							Home
 						</Link>
 						<Link
+							href="/dashboard"
+							className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-700 transition-all hover:bg-zinc-100 hover:text-black dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+						>
+							Dashboard
+						</Link>
+						<Link
 							href="/water-footprint"
 							className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-700 transition-all hover:bg-zinc-100 hover:text-black dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
 						>

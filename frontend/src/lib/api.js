@@ -260,6 +260,25 @@ export const API = {
 			);
 		}
 	},
+
+	// Get sensor data with predictions
+	getSensorData: async (startDate, endDate) => {
+		try {
+			const response = await apiClient.get("/sensor/pre-lime", {
+				params: {
+					start_date: startDate,
+					end_date: endDate,
+				},
+			});
+			return response.data || [];
+		} catch (error) {
+			throw new Error(
+				error.response?.data?.message ||
+					error.message ||
+					"Failed to fetch sensor data",
+			);
+		}
+	},
 };
 
 export default apiClient;
