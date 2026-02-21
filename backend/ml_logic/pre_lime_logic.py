@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Dict, List
-
+import pandas as pd
 from services.model_loader import pre_lime_assets
 
 # =========================
@@ -42,14 +42,14 @@ def get_optimal_pre_lime_dose_with_shap(
     predictions = []
 
     for dose in candidate_doses:
-        features = np.array([
-            raw_ph,
-            raw_turbidity,
-            raw_conductivity,
-            dose
-        ]).reshape(1, -1)
+        input_df = pd.DataFrame([{
+        "Raw_Water_PH": raw_ph,
+        "Raw_Water_Turbidity": raw_turbidity,
+        "Raw_Water_Conductivity": raw_conductivity,
+        "Pre_Lime_Dosage_ppm": dose
+    }])
 
-        scaled_features = scaler.transform(features)
+        scaled_features = scaler.transform(input_df)
 
         predicted_ph = float(model.predict(scaled_features)[0])
 
@@ -83,14 +83,14 @@ def get_optimal_pre_lime_dose_with_shap(
     # -------------------------------------------------
     # 3. SHAP explanation
     # -------------------------------------------------
-    shap_features = np.array([
-        raw_ph,
-        raw_turbidity,
-        raw_conductivity,
-        best_dose
-    ]).reshape(1, -1)
+    shap_df = pd.DataFrame([{
+    "Raw_Water_PH": raw_ph,
+    "Raw_Water_Turbidity": raw_turbidity,
+    "Raw_Water_Conductivity": raw_conductivity,
+    "Pre_Lime_Dosage_ppm": best_dose
+}])
 
-    shap_scaled = scaler.transform(shap_features)
+    shap_scaled = scaler.transform(shap_df)
 
     shap_values = explainer.shap_values(shap_scaled)
 

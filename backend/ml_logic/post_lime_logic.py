@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Dict
-
+import pandas as pd
 from services.model_loader import post_lime_assets
 
 # =========================
@@ -43,14 +43,14 @@ def get_optimal_post_lime_dose_with_shap(
     # 1. Dose simulation & prediction
     # -------------------------------------------------
     for dose in CANDIDATE_POST_LIME_DOSES:
-        features = np.array([
-            raw_ph,
-            raw_turbidity,
-            raw_conductivity,
-            dose
-        ]).reshape(1, -1)
+        input_df = pd.DataFrame([{
+    "Raw_Water_PH": raw_ph,
+    "Raw_Water_Turbidity": raw_turbidity,
+    "Raw_Water_Conductivity": raw_conductivity,
+    "Post_Lime_Dosage_SPH02_ppm": dose
+        }])
 
-        scaled_features = scaler.transform(features)
+        scaled_features = scaler.transform(input_df)
 
         delta_ph = float(model.predict(scaled_features)[0])
         final_ph = raw_ph + delta_ph
@@ -92,14 +92,14 @@ def get_optimal_post_lime_dose_with_shap(
     # -------------------------------------------------
     # 3. SHAP explanation (on ΔpH_post)
     # -------------------------------------------------
-    shap_features = np.array([
-        raw_ph,
-        raw_turbidity,
-        raw_conductivity,
-        best_dose
-    ]).reshape(1, -1)
+    shap_df = pd.DataFrame([{
+    "Raw_Water_PH": raw_ph,
+    "Raw_Water_Turbidity": raw_turbidity,
+    "Raw_Water_Conductivity": raw_conductivity,
+    "Post_Lime_Dosage_SPH02_ppm": best_dose
+}])
 
-    shap_scaled = scaler.transform(shap_features)
+    shap_scaled = scaler.transform(shap_df)
     shap_values = explainer.shap_values(shap_scaled)
 
     shap_explanation = {
