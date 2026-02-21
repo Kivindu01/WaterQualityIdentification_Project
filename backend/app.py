@@ -53,6 +53,16 @@ def create_app():
         unique=True
     )
 
+    sensor_db["classification_auto_predictions"].create_index(
+        "sensor_record_id",
+        unique=True
+    )
+
+    sensor_db["normal_regression_auto_predictions"].create_index(
+        "sensor_record_id",
+        unique=True
+    )
+
     print("✅ Sensor prediction indexes ensured")
 
     # =========================
