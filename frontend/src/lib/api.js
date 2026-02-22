@@ -66,9 +66,8 @@ export const API = {
 				},
 				safe_band: data.safe_band,
 				shap_explanation: data.shap_explanation,
-				explanation: data.ambatale_explanation_pre, 
+				explanation: data.ambatale_explanation_pre,
 			};
-
 		} catch (error) {
 			throw new Error(
 				error.response?.data?.message ||
@@ -261,7 +260,7 @@ export const API = {
 		}
 	},
 
-	// Get sensor data with predictions
+	// Get pre lime sensor data with predictions
 	getSensorData: async (startDate, endDate) => {
 		try {
 			const response = await apiClient.get("/sensor/pre-lime", {
@@ -276,6 +275,44 @@ export const API = {
 				error.response?.data?.message ||
 					error.message ||
 					"Failed to fetch sensor data",
+			);
+		}
+	},
+
+	// Get post lime sensor data with predictions
+	getPostLimeSensorData: async (startDate, endDate) => {
+		try {
+			const response = await apiClient.get("/sensor/post-lime", {
+				params: {
+					start_date: startDate,
+					end_date: endDate,
+				},
+			});
+			return response.data || [];
+		} catch (error) {
+			throw new Error(
+				error.response?.data?.message ||
+					error.message ||
+					"Failed to fetch post-lime sensor data",
+			);
+		}
+	},
+
+	// get alum dosing sensor data with predictions
+	getAlumSensorData: async (startDate, endDate) => {
+		try {
+			const response = await apiClient.get("/sensor/normal-regression", {
+				params: {
+					start_date: startDate,
+					end_date: endDate,
+				},
+			});
+			return response.data || [];
+		} catch (error) {
+			throw new Error(
+				error.response?.data?.message ||
+					error.message ||
+					"Failed to fetch alum dosing sensor data",
 			);
 		}
 	},
