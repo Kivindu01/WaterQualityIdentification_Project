@@ -59,13 +59,14 @@ export const API = {
 			const data = response.data.data;
 			return {
 				recommended_dose: data.recommended_dose_ppm,
-				settled_turbidity: data.predicted_settled_pH,
+				settled_ph: data.predicted_settled_pH,
 				conformal_interval: {
 					lower: data.conformal_interval.lower_pH,
 					upper: data.conformal_interval.upper_pH,
 				},
 				safe_band: data.safe_band,
 				shap_explanation: data.shap_explanation,
+				explanation: data.ambatale_explanation_pre,
 			};
 		} catch (error) {
 			throw new Error(
@@ -100,6 +101,7 @@ export const API = {
 				},
 				safe_band: data.safe_band,
 				shap_explanation: data.shap_explanation,
+				explanation: data.ambatale_explanation_post,
 			};
 		} catch (error) {
 			throw new Error(
@@ -254,6 +256,63 @@ export const API = {
 				error.response?.data?.message ||
 					error.message ||
 					"Failed to fetch alum history",
+			);
+		}
+	},
+
+	// Get pre lime sensor data with predictions
+	getSensorData: async (startDate, endDate) => {
+		try {
+			const response = await apiClient.get("/sensor/pre-lime", {
+				params: {
+					start_date: startDate,
+					end_date: endDate,
+				},
+			});
+			return response.data || [];
+		} catch (error) {
+			throw new Error(
+				error.response?.data?.message ||
+					error.message ||
+					"Failed to fetch sensor data",
+			);
+		}
+	},
+
+	// Get post lime sensor data with predictions
+	getPostLimeSensorData: async (startDate, endDate) => {
+		try {
+			const response = await apiClient.get("/sensor/post-lime", {
+				params: {
+					start_date: startDate,
+					end_date: endDate,
+				},
+			});
+			return response.data || [];
+		} catch (error) {
+			throw new Error(
+				error.response?.data?.message ||
+					error.message ||
+					"Failed to fetch post-lime sensor data",
+			);
+		}
+	},
+
+	// get alum dosing sensor data with predictions
+	getAlumSensorData: async (startDate, endDate) => {
+		try {
+			const response = await apiClient.get("/sensor/normal-regression", {
+				params: {
+					start_date: startDate,
+					end_date: endDate,
+				},
+			});
+			return response.data || [];
+		} catch (error) {
+			throw new Error(
+				error.response?.data?.message ||
+					error.message ||
+					"Failed to fetch alum dosing sensor data",
 			);
 		}
 	},

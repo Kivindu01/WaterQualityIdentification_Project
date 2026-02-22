@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Dict
-
+import pandas as pd
 from services.model_loader import post_lime_assets
 
 # =========================
@@ -43,14 +43,14 @@ def get_optimal_post_lime_dose_with_shap(
     # 1. Dose simulation & prediction
     # -------------------------------------------------
     for dose in CANDIDATE_POST_LIME_DOSES:
-        features = np.array([
-            raw_ph,
-            raw_turbidity,
-            raw_conductivity,
-            dose
-        ]).reshape(1, -1)
+        input_df = pd.DataFrame([{
+    "Raw_Water_PH": raw_ph,
+    "Raw_Water_Turbidity": raw_turbidity,
+    "Raw_Water_Conductivity": raw_conductivity,
+    "Post_Lime_Dosage_SPH02_ppm": dose
+        }])
 
-        scaled_features = scaler.transform(features)
+        scaled_features = scaler.transform(input_df)
 
         delta_ph = float(model.predict(scaled_features)[0])
         final_ph = raw_ph + delta_ph
@@ -92,14 +92,14 @@ def get_optimal_post_lime_dose_with_shap(
     # -------------------------------------------------
     # 3. SHAP explanation (on ΔpH_post)
     # -------------------------------------------------
-    shap_features = np.array([
-        raw_ph,
-        raw_turbidity,
-        raw_conductivity,
-        best_dose
-    ]).reshape(1, -1)
+    shap_df = pd.DataFrame([{
+    "Raw_Water_PH": raw_ph,
+    "Raw_Water_Turbidity": raw_turbidity,
+    "Raw_Water_Conductivity": raw_conductivity,
+    "Post_Lime_Dosage_SPH02_ppm": best_dose
+}])
 
-    shap_scaled = scaler.transform(shap_features)
+    shap_scaled = scaler.transform(shap_df)
     shap_values = explainer.shap_values(shap_scaled)
 
     shap_explanation = {
@@ -128,8 +128,18 @@ def get_optimal_post_lime_dose_with_shap(
     }
 
     # -------------------------------------------------
-    # 5. Final structured response
+    # 5. Build human explanation
     # -------------------------------------------------
+    explanation_text = build_postlime_explanation(
+        best_dose,
+        best_final_ph,
+        best_delta_ph,
+        shap_explanation
+    )
+
+        # -------------------------------------------------
+        # 6. Final structured response
+        # -------------------------------------------------
     return {
         "recommended_post_lime_dose_ppm": best_dose,
         "predicted_delta_pH": best_delta_ph,
@@ -139,5 +149,71 @@ def get_optimal_post_lime_dose_with_shap(
             "upper": SAFE_PH_UPPER
         },
         "conformal_interval": conformal_interval,
-        "shap_explanation": shap_explanation
+        "shap_explanation": shap_explanation,
+        "ambatale_explanation_post": explanation_text
     }
+
+
+
+# =========================================================
+# POST-LIME HUMAN EXPLANATION BUILDER
+# =========================================================
+
+def build_postlime_explanation(
+    best_dose: float,
+    best_final_ph: float,
+    best_delta_ph: float,
+    shap_data: dict
+) -> str:
+
+    raw_ph = shap_data["feature_values"][0]
+    turb = shap_data["feature_values"][1]
+    cond = shap_data["feature_values"][2]
+
+    shap_vals = shap_data["shap_values"]
+
+    ph_sv = shap_vals[0]
+    turb_sv = shap_vals[1]
+    cond_sv = shap_vals[2]
+    dose_sv = shap_vals[3]
+
+    def direction(val):
+        return "increases" if val > 0 else "decreases"
+
+    def abs_fmt(val):
+        return f"{abs(val):.3f}"
+
+    # Safe band message
+    if SAFE_PH_LOWER <= best_final_ph <= SAFE_PH_UPPER:
+        band_text = (
+            f"This predicted final pH lies within the operational treated-water pH band "
+            f"of {SAFE_PH_LOWER:.1f}–{SAFE_PH_UPPER:.1f}."
+        )
+    elif best_final_ph < SAFE_PH_LOWER:
+        band_text = (
+            f"This predicted final pH is below the operational treated-water pH band "
+            f"of {SAFE_PH_LOWER:.1f}–{SAFE_PH_UPPER:.1f}."
+        )
+    else:
+        band_text = (
+            f"This predicted final pH is above the operational treated-water pH band "
+            f"of {SAFE_PH_LOWER:.1f}–{SAFE_PH_UPPER:.1f}."
+        )
+
+    paragraph = (
+        f"The AI model recommends a post-lime dosage of {best_dose:.0f} ppm "
+        f"based on the current settled water conditions. "
+        f"The incoming pH before post-lime is {raw_ph:.2f}, "
+        f"with turbidity {turb:.1f} NTU and conductivity {cond:.1f} µS/cm. "
+        f"The model predicts a pH increase (ΔpH) of {best_delta_ph:.3f}, "
+        f"resulting in a final treated water pH of {best_final_ph:.3f}. "
+        f"{band_text} "
+        f"The prediction is primarily influenced by key process factors. "
+        f"Raw_Water_PH {direction(ph_sv)} the predicted ΔpH by {abs_fmt(ph_sv)} units. "
+        f"Raw_Water_Turbidity {direction(turb_sv)} the predicted ΔpH by {abs_fmt(turb_sv)} units. "
+        f"Raw_Water_Conductivity {direction(cond_sv)} the predicted ΔpH by {abs_fmt(cond_sv)} units. "
+        f"The selected post-lime dose {direction(dose_sv)} the predicted ΔpH by {abs_fmt(dose_sv)} units. "
+        f"These combined effects justify the recommended post-lime dosage."
+    )
+
+    return paragraph

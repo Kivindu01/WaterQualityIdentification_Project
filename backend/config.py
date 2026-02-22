@@ -39,6 +39,24 @@ MONGODB_URI = (
 )
 
 # =========================
+# SENSOR DATABASE (NEW)
+# =========================
+
+SENSOR_DATABASE_NAME = os.getenv(
+    "SENSOR_DATABASE_NAME",
+    "water_automatic_sensor_db"
+)
+
+SENSOR_COLLECTION_NAME = os.getenv(
+    "SENSOR_COLLECTION_NAME",
+    "automatic_readings"
+)
+
+SENSOR_PREDICTION_COLLECTION = os.getenv(
+    "SENSOR_PREDICTION_COLLECTION",
+    "sensor_auto_predictions"
+)
+# =========================
 # JWT CONFIG
 # =========================
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "super-secret-key")

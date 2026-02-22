@@ -3,13 +3,10 @@ from pymongo.errors import ConnectionFailure
 import config
 
 _client = None
-_db = None
+_db_cache = {}
 
 
 def get_mongo_client():
-    """
-    Create and return a singleton MongoDB client.
-    """
     global _client
 
     if _client is None:
@@ -18,7 +15,6 @@ def get_mongo_client():
                 config.MONGODB_URI,
                 serverSelectionTimeoutMS=5000
             )
-            # Force connection test
             _client.admin.command("ping")
             print("✅ MongoDB connection established")
         except ConnectionFailure as e:
@@ -28,14 +24,18 @@ def get_mongo_client():
     return _client
 
 
-def get_database():
+def get_database(db_name=None):
     """
-    Return the MongoDB database instance.
+    Returns requested database.
+    Default = water_quality_db
     """
-    global _db
 
-    if _db is None:
-        client = get_mongo_client()
-        _db = client[config.MONGODB_DATABASE_NAME]
+    client = get_mongo_client()
 
-    return _db
+    if db_name is None:
+        db_name = config.MONGODB_DATABASE_NAME
+
+    if db_name not in _db_cache:
+        _db_cache[db_name] = client[db_name]
+
+    return _db_cache[db_name]
