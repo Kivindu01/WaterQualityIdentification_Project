@@ -130,7 +130,9 @@ export default function Dashboard() {
 				alumRecommendedDose:
 					latestAlum?.prediction?.recommended_dose_ppm?.toFixed(2) || "---",
 				postLimeRecommendedDose:
-					latestPostLime?.prediction?.recommended_post_lime_dose_ppm?.toFixed(2) || "---",
+					latestPostLime?.prediction?.recommended_post_lime_dose_ppm?.toFixed(
+						2,
+					) || "---",
 			});
 
 			// ✅ Always create new array reference - no need to reverse again since already reversed
@@ -659,6 +661,29 @@ export default function Dashboard() {
 										/>
 									</LineChart>
 								</ResponsiveContainer>
+							</div>
+
+							<br />
+							<div className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 ">
+								<p>
+									<h3 className="text-lg font-bold text-black dark:text-white mb-4">
+										Pre Lime Explanation
+									</h3>
+								</p>
+								<p className="leading-relaxed text-zinc-700 dark:text-zinc-300">
+									{sensorData[0]?.prediction?.ambatale_explanation_pre}
+								</p>
+							</div>
+							<br />
+							<div className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 ">
+								<p>
+									<h3 className="text-lg font-bold text-black dark:text-white mb-4">
+										Post Lime Explanation
+									</h3>
+								</p>
+								<p className="leading-relaxed text-zinc-700 dark:text-zinc-300">
+									{postlmeSensorData[0]?.prediction?.ambatale_explanation_post}
+								</p>
 							</div>
 						</div>
 					</motion.div>
