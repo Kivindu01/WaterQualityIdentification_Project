@@ -16,13 +16,15 @@ def build_features(raw_turb, raw_ph, raw_cond, dose, feature_names):
     }
     return np.array([[features[col] for col in feature_names]], dtype=float)
 
+def select_optimal_dose(pred_9, pred_10, target=5):
 
-def select_optimal_dose(pred_9, pred_10):
-    if pred_9 <= pred_10:
+    if pred_9 < target:
         return 9, pred_9
-    else:
+
+    if pred_10 < target:
         return 10, pred_10
 
+    return (9, pred_9) if pred_9 <= pred_10 else (10, pred_10)
 
 def predict_turbidity(features: Dict) -> Dict:
 
